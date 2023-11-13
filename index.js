@@ -27,6 +27,7 @@ const mainMenu = () => {
                 'Add an Employee',
                 'Update Employee Role',
                 'Delete Department',
+                'Delete Employee',
                 'Exit'
             ]
         }
@@ -71,6 +72,8 @@ const mainMenu = () => {
                 break;
             case 'Delete Department':
                 promptDeleteDepartment();
+            case 'Delete Employee':
+                promptDeleteEmployee();
                 break;
             case 'Exit':
                 console.log('Goodbye!');
@@ -228,6 +231,29 @@ const promptDeleteDepartment = async () => {
         mainMenu(); 
     } catch (err) {
         console.error('Error deleting department:', err);
+    }
+};
+
+const promptDeleteEmployee = async () => {
+    try {
+        const employees = await employeeQueries.getAllEmployees();
+        const employeeChoices = employees.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }));
+
+        const answers = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'employeeId',
+                message: 'Select the employee to delete:',
+                choices: employeeChoices
+            }
+        ]);
+
+        await employeeQueries.deleteEmployee(answers.employeeId);
+
+        console.log('Employee deleted successfully.');
+        mainMenu(); 
+    } catch (err) {
+        console.error('Error deleting employee:', err);
     }
 };
 
