@@ -61,8 +61,8 @@ View all employees: Display employee data, including IDs, first names, last name
 Add a department: Add a new department to the database.
 Add a role: Add a new role with a title, salary, and department association.
 Add an employee: Add a new employee with first name, last name, role, and manager.
-Update employee role: Change an employee's role to a different one, a better one or worse?
-Delete department: Remove a department from the database.
+Update employee role and manager: Change an employee's role to a different one, a better one or worse?
+Delete department and employees: Remove a department from the database.
 
 ## License
 This project is not currently under any license. Feel free to clone and use for any purpose, giving credit where it's due. 

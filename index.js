@@ -22,6 +22,7 @@ const mainMenu = () => {
                 'View All Departments',
                 'View All Roles',
                 'View All Employees',
+                'View Employees by Manager',
                 'Add a Department',
                 'Add a Role',
                 'Add an Employee',
@@ -58,6 +59,9 @@ const mainMenu = () => {
                         mainMenu();
                     })
                     .catch(err => console.error('Error viewing employees:', err));
+                break;
+            case 'View Employees by Manager':
+                viewEmployeesByManager();
                 break;
             case 'Add a Department':
                 promptForDepartment();
@@ -288,6 +292,19 @@ const promptUpdateEmployeeManager = async () => {
     } catch (err) {
         console.error('Error updating employee manager:', err);
     }
+};
+
+const viewEmployeesByManager = () => {
+    employeeQueries.getEmployeesByManager()
+        .then(employeeGroups => {
+            employeeGroups.forEach(group => {
+                console.log(`Manager: ${group.manager}`);
+                console.log(`Employees: ${group.employees}`);
+                console.log('------------------------');
+            });
+            mainMenu();
+        })
+        .catch(err => console.error('Error viewing employees by manager:', err));
 };
 
 
