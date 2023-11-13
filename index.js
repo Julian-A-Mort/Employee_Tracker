@@ -3,33 +3,135 @@
 const connection = require('./db/connection');
 const inquirer = require('inquirer');
 const { viewAllDepartments, addDepartment, } = require('./lib/department');
-const { viewAllEmployees, addEmployee, } = require('./lib/department');
-const { viewAllRoles, addRole, } = require('./lib/department');
+const { viewAllEmployees, addEmployee, } = require('./lib/employee');
+const { viewAllRoles, addRole, } = require('./lib/role');
 
-connection.query('SELECT * FROM departments', (error, results) => {
-    if (error) throw error;
-    console.log(results);
-});
-
-const mainMenu = async () => {
-    const { action } = await inquirer.prompt([
+const mainMenu = () => {
+    inquirer.prompt([
         {
             type: 'list',
             name: 'action',
             message: 'What would you like to do?',
-            choices: ['View all departments', /* other options */]
+            choices: [
+                'View all departments',
+                'View all roles',
+                'View all employees',
+                'Add a department',
+                'Add a role',
+                'Add an employee',
+                'Exit'
+            ]
         }
-    ]);
-
-    switch (action) {
-        case 'View all departments':
-            const departments = await viewAllDepartments();
-            console.table(departments);
-            break;
-        // Handle other actions
-    }
-
-    mainMenu(); // Call the menu again to allow for more actions
+    ])
+    .then(answers => {
+        switch (answers.action) {
+            case 'View all departments':
+                viewAllDepartments().then(/* handle the display */).catch(/* handle errors */);
+                break;
+            case 'View all roles':
+                viewAllRoles().then(/* handle the display */).catch(/* handle errors */);
+                break;
+            case 'View all employees':
+                viewAllEmployees().then(/* handle the display */).catch(/* handle errors */);
+                break;
+            case 'Add a department':
+                promptForDepartment();
+                break;
+            case 'Add a role':
+                promptForRole();
+                break;
+            case 'Add an employee':
+                promptForEmployee();
+                break;
+            case 'Exit':
+                process.exit();
+        }
+    });
 };
+
+const promptForDepartment = () => {
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'departmentName',
+            message: 'Enter the name of the new department:'
+        }
+    ])
+    .then(answer => {
+        addDepartment(answer.departmentName)
+            .then(() => {
+                console.log(`Added ${answer.departmentName} to departments`);
+                mainMenu();
+            })
+            .catch(err => console.error('Error adding department:', err));
+    });
+};
+
+const promptForEmployee = async () => {
+    try {
+        const answers = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'first_name',
+                message: 'Enter the employee\'s first name:'
+            },
+            {
+                type: 'input',
+                name: 'last_name',
+                message: 'Enter the employee\'s last name:'
+            },
+            {
+                type: 'list',
+                name: 'role_id',
+                message: "Select the employee's role:",
+                choices: roleChoices // Ensure this is an array of role options
+            },
+            {
+                type: 'list',
+                name: 'manager_id',
+                message: "Select the employee's manager:",
+                choices: managerChoices // Ensure this is an array of manager options
+            }
+        ]);
+
+        await addEmployee(answers.first_name, answers.last_name, answers.role_id, answers.manager_id);
+        console.log(`Added ${answers.first_name} ${answers.last_name} to employees`);
+        mainMenu();
+
+    } catch (err) {
+        console.error('Error adding employee:', err);
+    }
+};
+
+
+const promptForRole = async () => {
+    try {
+        const answers = await inquirer.prompt([
+            {
+                type: 'input',
+                name: 'title',
+                message: 'Enter the role title:'
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'Enter the salary for this role:'
+            },
+            {
+                type: 'input',
+                name: 'department_id',
+                message: "Enter the department ID for this role:",
+            }
+        ]);
+
+        await addRole(answers.title, answers.salary, answers.department_id);
+        console.log(`Added ${answers.title} to roles`);
+        mainMenu(); 
+
+    } catch (err) {
+        console.error('Error adding role:', err);
+    }
+};
+
 
 mainMenu();
