@@ -26,6 +26,7 @@ const mainMenu = () => {
                 'Add a Role',
                 'Add an Employee',
                 'Update Employee Role',
+                'Update Employee Manager',
                 'Delete Department',
                 'Delete Employee',
                 'Exit'
@@ -69,6 +70,9 @@ const mainMenu = () => {
                 break;
             case 'Update Employee Role':
                 promptUpdateEmployeeRole();
+                break;
+            case 'Update Employee Manager':
+                promptUpdateEmployeeManager();
                 break;
             case 'Delete Department':
                 promptDeleteDepartment();
@@ -256,5 +260,35 @@ const promptDeleteEmployee = async () => {
         console.error('Error deleting employee:', err);
     }
 };
+
+const promptUpdateEmployeeManager = async () => {
+    try {
+        const employees = await employeeQueries.getAllEmployees(); // Fetch all employees
+        const employeeChoices = employees.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }));
+
+        const answers = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'employeeId',
+                message: 'Select the employee whose manager you want to update:',
+                choices: employeeChoices
+            },
+            {
+                type: 'list',
+                name: 'newManagerId',
+                message: 'Select the new manager for the employee:',
+                choices: employeeChoices // Allow choosing from all employees
+            }
+        ]);
+
+        await employeeQueries.updateEmployeeManager(answers.employeeId, answers.newManagerId);
+
+        console.log('Employee manager updated successfully.');
+        mainMenu(); 
+    } catch (err) {
+        console.error('Error updating employee manager:', err);
+    }
+};
+
 
 mainMenu();
