@@ -23,6 +23,7 @@ const mainMenu = () => {
                 'View All Roles',
                 'View All Employees',
                 'View Employees by Manager',
+                'View Department Budget',
                 'Add a Department',
                 'Add a Role',
                 'Add an Employee',
@@ -62,6 +63,9 @@ const mainMenu = () => {
                 break;
             case 'View Employees by Manager':
                 viewEmployeesByManager();
+                break;
+            case 'View Department Budget':
+                promptForDepartmentBudget();
                 break;
             case 'Add a Department':
                 promptForDepartment();
@@ -307,5 +311,26 @@ const viewEmployeesByManager = () => {
         .catch(err => console.error('Error viewing employees by manager:', err));
 };
 
+const promptForDepartmentBudget = async () => {
+    try {
+        const departments = await departmentQueries.getAllDepartments();
+        const departmentChoices = departments.map(dept => ({ name: dept.name, value: dept.id }));
+
+        const answer = await inquirer.prompt([
+            {
+                type: 'list',
+                name: 'departmentId',
+                message: 'Select the department to view its budget or lack of:',
+                choices: departmentChoices
+            }
+        ]);
+
+        const budget = await departmentQueries.getDepartmentBudget(answer.departmentId);
+        console.table(budget);
+        mainMenu();
+    } catch (err) {
+        console.error('Error viewing department budget:', err);
+    }
+};
 
 mainMenu();
