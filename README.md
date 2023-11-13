@@ -11,17 +11,16 @@ Promoted and demote with ease!
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
+- [Example Video](#example)
 - [License](#license)
 
 ## Installation
 
 You Have Two Options
 
-## Use Live Application
+## Usage
 
 Visit the live application on Heroku: [https://dashboard.heroku.com/apps/warm-sands-76108](https://warm-sands-76108-6993c4b7e4f4.herokuapp.com/)
-
-## Run Locally
 
 Before you begin, ensure you have met the following requirements:
 
@@ -63,6 +62,9 @@ Add a role: Add a new role with a title, salary, and department association.
 Add an employee: Add a new employee with first name, last name, role, and manager.
 Update employee role and manager: Change an employee's role to a different one, a better one or worse?
 Delete department and employees: Remove a department from the database.
+
+## Example
+[![Example Video](./videos/Video%20preview.png)](https://www.youtube.com/watch?v=11e8KYcpW_o "Video Title")
 
 ## License
 This project is not currently under any license. Feel free to clone and use for any purpose, giving credit where it's due. 
