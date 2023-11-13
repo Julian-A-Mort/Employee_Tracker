@@ -26,13 +26,37 @@ const mainMenu = () => {
     .then(answers => {
         switch (answers.action) {
             case 'View all departments':
-                viewAllDepartments().then(/* handle the display */).catch(/* handle errors */);
+                viewAllDepartments()
+                .then(departments => {
+                    console.table(departments);
+                    mainMenu();
+                })
+                .catch(err => {
+                    console.error('Error viewing departments:', err);
+                    mainMenu();
+                });                
                 break;
             case 'View all roles':
-                viewAllRoles().then(/* handle the display */).catch(/* handle errors */);
+                viewAllRoles()
+                .then(roles => {
+                    console.table(roles);
+                    mainMenu();
+                })
+                .catch(err => {
+                    console.error('Error viewing roles:', err);
+                    mainMenu();
+                });
                 break;
             case 'View all employees':
-                viewAllEmployees().then(/* handle the display */).catch(/* handle errors */);
+                viewAllEmployees()
+                .then(employees => {
+                    console.table(employees);
+                    mainMenu();
+                })
+                .catch(err => {
+                    console.error('Error viewing employees:', err);
+                    mainMenu();
+                });                
                 break;
             case 'Add a department':
                 promptForDepartment();
