@@ -156,12 +156,12 @@ const promptForRole = async () => {
             },
             {
                 type: 'input',
-                name: 'department_id',
-                message: "Enter the department ID for this role:",
+                name: 'department_name',
+                message: "Which department does this belong to:",
             }
         ]);
 
-        await roleQueries.addRole(answers.title, answers.salary, answers.department_id);
+        await roleQueries.addRole(answers.title, answers.salary, answers.department_name);
         console.log(`Added ${answers.title} to roles`);
         mainMenu(); 
 
@@ -204,6 +204,7 @@ const promptUpdateManager = async () => {
 const promptViewByManager = async () => {
     try {
         const managers = await employeeQueries.getAllManagers();
+        console.log("Managers fetched:", managers); // Debug log
         const managerChoices = managers.map(manager => ({ name: manager.name, value: manager.id }));
 
         const { managerId } = await inquirer.prompt([
