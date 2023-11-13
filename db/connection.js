@@ -10,8 +10,11 @@ const connection = mysql.createConnection({
 
 // Open the MySQL connection
 connection.connect(error => {
-    if (error) throw error;
-    console.log("Boop beep boop database connected");
+    if (error) {
+        console.error('Error connecting: ' + error.stack);
+        return;
+    }
+    console.log('Connected as id ' + connection.threadId);
 });
 
 module.exports = connection;
