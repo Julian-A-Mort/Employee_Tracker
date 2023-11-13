@@ -1,10 +1,14 @@
-// run node index.js to start application
+// mysql -u MrMort -p 
+// node index.js to start application
 
-const connection = require('./db/connection');
 const inquirer = require('inquirer');
-const { viewAllDepartments, addDepartment, } = require('./lib/department');
-const { viewAllEmployees, addEmployee, } = require('./lib/employee');
-const { viewAllRoles, addRole, } = require('./lib/role');
+const DepartmentQueries = require('./lib/departmentQueries');
+const EmployeeQueries = require('./lib/employeeQueries');
+const RoleQueries = require('./lib/roleQueries');
+
+const departmentQueries = new DepartmentQueries();
+const employeeQueries = new EmployeeQueries();
+const roleQueries = new RoleQueries();
 
 const mainMenu = () => {
     inquirer.prompt([
@@ -13,61 +17,53 @@ const mainMenu = () => {
             name: 'action',
             message: 'What would you like to do?',
             choices: [
-                'View all departments',
-                'View all roles',
-                'View all employees',
-                'Add a department',
-                'Add a role',
-                'Add an employee',
+                'View All Departments',
+                'View All Roles',
+                'View All Employees',
+                'Add a Department',
+                'Add a Role',
+                'Add an Employee',
                 'Exit'
             ]
         }
     ])
     .then(answers => {
         switch (answers.action) {
-            case 'View all departments':
-                viewAllDepartments()
-                .then(departments => {
-                    console.table(departments);
-                    mainMenu();
-                })
-                .catch(err => {
-                    console.error('Error viewing departments:', err);
-                    mainMenu();
-                });                
+            case 'View All Departments':
+                departmentQueries.getAllDepartments()
+                    .then(departments => {
+                        console.table(departments);
+                        mainMenu();
+                    })
+                    .catch(err => console.error('Error viewing departments:', err));
                 break;
-            case 'View all roles':
-                viewAllRoles()
-                .then(roles => {
-                    console.table(roles);
-                    mainMenu();
-                })
-                .catch(err => {
-                    console.error('Error viewing roles:', err);
-                    mainMenu();
-                });
+            case 'View All Roles':
+                roleQueries.getAllRoles()
+                    .then(roles => {
+                        console.table(roles);
+                        mainMenu();
+                    })
+                    .catch(err => console.error('Error viewing roles:', err));
                 break;
-            case 'View all employees':
-                viewAllEmployees()
-                .then(employees => {
-                    console.table(employees);
-                    mainMenu();
-                })
-                .catch(err => {
-                    console.error('Error viewing employees:', err);
-                    mainMenu();
-                });                
+            case 'View All Employees':
+                employeeQueries.getAllEmployees()
+                    .then(employees => {
+                        console.table(employees);
+                        mainMenu();
+                    })
+                    .catch(err => console.error('Error viewing employees:', err));
                 break;
-            case 'Add a department':
+            case 'Add a Department':
                 promptForDepartment();
                 break;
-            case 'Add a role':
+            case 'Add a Role':
                 promptForRole();
                 break;
-            case 'Add an employee':
+            case 'Add an Employee':
                 promptForEmployee();
                 break;
             case 'Exit':
+                console.log('Goodbye!');
                 process.exit();
         }
     });
@@ -82,7 +78,7 @@ const promptForDepartment = () => {
         }
     ])
     .then(answer => {
-        addDepartment(answer.departmentName)
+        departmentQueries.addDepartment(answer.departmentName)
             .then(() => {
                 console.log(`Added ${answer.departmentName} to departments`);
                 mainMenu();
@@ -118,7 +114,7 @@ const promptForEmployee = async () => {
             }
         ]);
 
-        await addEmployee(answers.first_name, answers.last_name, answers.role_id, answers.manager_id);
+        await employeeQueries.addEmployee(answers.first_name, answers.last_name, answers.role_id, answers.manager_id);
         console.log(`Added ${answers.first_name} ${answers.last_name} to employees`);
         mainMenu();
 
@@ -148,7 +144,7 @@ const promptForRole = async () => {
             }
         ]);
 
-        await addRole(answers.title, answers.salary, answers.department_id);
+        await roleQueries.addRole(answers.title, answers.salary, answers.department_id);
         console.log(`Added ${answers.title} to roles`);
         mainMenu(); 
 
