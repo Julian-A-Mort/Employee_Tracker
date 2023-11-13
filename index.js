@@ -22,11 +22,10 @@ const mainMenu = () => {
                 'View All Departments',
                 'View All Roles',
                 'View All Employees',
-                'View Employees by Manager',
                 'Add a Department',
                 'Add a Role',
                 'Add an Employee',
-                'Update Employee Manager',
+                'Update Employee Role',
                 'Exit'
             ]
         }
@@ -57,12 +56,6 @@ const mainMenu = () => {
                     })
                     .catch(err => console.error('Error viewing employees:', err));
                 break;
-            case 'View employees by manager':
-                promptViewByManager();
-                break;
-            case 'Update employee manager':
-                promptUpdateManager();
-                break;
             case 'Add a Department':
                 promptForDepartment();
                 break;
@@ -71,6 +64,9 @@ const mainMenu = () => {
                 break;
             case 'Add an Employee':
                 promptForEmployee();
+                break;
+            case 'Update Employee Role':
+                promptUpdateEmployeeRole();
                 break;
             case 'Exit':
                 console.log('Goodbye!');
@@ -103,8 +99,8 @@ const promptForEmployee = async () => {
         const roles = await roleQueries.getAllRoles();
         const roleChoices = roles.map(role => ({ name: role.title, value: role.id }));
 
-        const managers = await employeeQueries.getAllManagers();
-        const managerChoices = managers.map(manager => ({ name: manager.name, value: manager.id }));
+        const employees = await employeeQueries.getAllEmployees();
+        const employeeChoices = employees.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }));
 
         const answers = await inquirer.prompt([
             {
@@ -127,7 +123,7 @@ const promptForEmployee = async () => {
                 type: 'list',
                 name: 'manager_id',
                 message: "Select the employee's manager:",
-                choices: managerChoices
+                choices: employeeChoices
             }
         ]);
 
@@ -143,6 +139,12 @@ const promptForEmployee = async () => {
 
 const promptForRole = async () => {
     try {
+        const roles = await roleQueries.getAllRoles();
+        const departments = await departmentQueries.getAllDepartments();
+
+        const roleChoices = roles.map(role => ({ name: role.title, value: role.id }));
+        const departmentChoices = departments.map(dept => ({ name: dept.name, value: dept.id }));
+
         const answers = await inquirer.prompt([
             {
                 type: 'input',
@@ -155,13 +157,14 @@ const promptForRole = async () => {
                 message: 'Enter the salary for this role:'
             },
             {
-                type: 'input',
-                name: 'department_name',
-                message: "Which department does this belong to:",
+                type: 'list',
+                name: 'department_id',
+                message: "Select the department for this role:",
+                choices: departmentChoices
             }
         ]);
 
-        await roleQueries.addRole(answers.title, answers.salary, answers.department_name);
+        await roleQueries.addRole(answers.title, answers.salary, answers.department_id);
         console.log(`Added ${answers.title} to roles`);
         mainMenu(); 
 
@@ -170,59 +173,35 @@ const promptForRole = async () => {
     }
 };
 
-const promptUpdateManager = async () => {
+const promptUpdateEmployeeRole = async () => {
     try {
         const employees = await employeeQueries.getAllEmployees();
+        const roles = await roleQueries.getAllRoles();
+
         const employeeChoices = employees.map(emp => ({ name: `${emp.first_name} ${emp.last_name}`, value: emp.id }));
-        
-        const managers = await employeeQueries.getAllManagers();
-        const managerChoices = managers.map(manager => ({ name: manager.name, value: manager.id }));
+        const roleChoices = roles.map(role => ({ name: role.title, value: role.id }));
 
         const answers = await inquirer.prompt([
             {
                 type: 'list',
                 name: 'employeeId',
-                message: 'Select the employee:',
+                message: 'Select the employee whose role you want to update:',
                 choices: employeeChoices
             },
             {
                 type: 'list',
-                name: 'managerId',
-                message: 'Select the new manager:',
-                choices: managerChoices
+                name: 'roleId',
+                message: 'Select the new role for the employee:',
+                choices: roleChoices
             }
         ]);
 
-        await employeeQueries.updateEmployeeManager(answers.employeeId, answers.managerId);
-        console.log('Employee manager updated successfully.');
+        await employeeQueries.updateEmployeeRole(answers.employeeId, answers.roleId);
+        console.log('Employee role updated successfully.');
         mainMenu();
     } catch (err) {
         console.error('Error:', err);
     }
 };
-
-const promptViewByManager = async () => {
-    try {
-        const managers = await employeeQueries.getAllManagers();
-        console.log("Managers fetched:", managers); // Debug log
-        const managerChoices = managers.map(manager => ({ name: manager.name, value: manager.id }));
-
-        const { managerId } = await inquirer.prompt([
-            {
-                type: 'list',
-                name: 'managerId',
-                message: 'Select a manager:',
-                choices: managerChoices
-            }
-        ]);
-
-        const employees = await employeeQueries.getEmployeesByManager(managerId);
-        console.table(employees);
-        mainMenu();
-    } catch (err) {
-        console.error('Error:', err);
-    }
-};
-
 
 mainMenu();
